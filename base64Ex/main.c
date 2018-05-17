@@ -33,9 +33,9 @@ char * base64Encode(char * msg)
     base64[b64Len]  = 0;
     for(long msgIx=0,b64Ix=0;msgIx < alignLen;msgIx+=3,b64Ix+=4)
     {
-        base64[b64Ix]   = B64_T[(msg[msgIx]  & 252)  >> 2];
-        base64[b64Ix+1] = B64_T[((msg[msgIx] & 3)    << 4) | ((msg[msgIx+1] & 240) >>4)];
-        base64[b64Ix+2] = B64_T[((msg[msgIx+1] & 15) << 2) | ((msg[msgIx+2] & 192) >>6)];
+        base64[b64Ix]   = B64_T[msg[msgIx] >> 2];
+        base64[b64Ix+1] = B64_T[((msg[msgIx] & 3)    << 4) | (msg[msgIx+1] >> 4)];
+        base64[b64Ix+2] = B64_T[((msg[msgIx+1] & 15) << 2) | (msg[msgIx+2] >> 6)];
         base64[b64Ix+3] = B64_T[msg[msgIx+2]   & 63];
     }
     
