@@ -26,12 +26,11 @@ char * base64Encode(char * msg)
     long length     = len(msg);
     long dif        = length % 3;
     long fillingLen = length + (dif==0?0:3-dif);
-    long alignLen   = length - dif;
     long b64Len     = (fillingLen / 3) << 2;
     char * base64   = malloc(b64Len +1);
     assert(base64!=0);
     base64[b64Len]  = 0;
-    for(long msgIx=0,b64Ix=0;msgIx < alignLen;msgIx+=3,b64Ix+=4)
+    for(long msgIx=0,b64Ix=0;b64Ix < b64Len;msgIx+=3,b64Ix+=4)
     {
         base64[b64Ix]   = B64_T[msg[msgIx] >> 2];
         base64[b64Ix+1] = B64_T[((msg[msgIx] & 3)    << 4) | (msg[msgIx+1] >> 4)];
@@ -41,20 +40,12 @@ char * base64Encode(char * msg)
     
     if(dif == 1)
     {
-        long b64Ix      = alignLen / 3 << 2;
-        base64[b64Ix]   = B64_T[(msg[alignLen] & 252) >> 2];
-        base64[b64Ix+1] = B64_T[(msg[alignLen] & 3) << 4];
-        base64[b64Ix+2] = '=';
-        base64[b64Ix+3] = '=';
+        base64[b64Len-2] = '=';
+        base64[b64Len-1] = '=';
     }
     else if(dif == 2)
     {
-        long msgIx      = alignLen;
-        long b64Ix      = alignLen / 3 << 2;
-        base64[b64Ix]   = B64_T[(msg[msgIx]   & 252) >> 2];
-        base64[b64Ix+1] = B64_T[((msg[msgIx]  & 3)   << 4) | ((msg[msgIx+1] & 240) >>4)];
-        base64[b64Ix+2] = B64_T[(msg[msgIx+1] & 15) << 2];
-        base64[b64Ix+3] = '=';
+        base64[b64Len-1] = '=';
     }
     
     return base64;
@@ -69,7 +60,7 @@ char * base64Decode(char * b64)
     assert(msg!= 0);
     for(int b64Ix = 0 ,msgIx = 0;b64Ix < b64len;b64Ix+=4,msgIx +=3)
     {
-        msg[msgIx]   = d_t[b64[b64Ix]] << 2   | d_t[b64[b64Ix+1]]  >> 4 ;
+        msg[msgIx]   = d_t[b64[b64Ix]]   << 2 | d_t[b64[b64Ix+1]] >> 4 ;
         msg[msgIx+1] = d_t[b64[b64Ix+1]] << 4 | d_t[b64[b64Ix+2]] >> 2  ;
         msg[msgIx+2] = d_t[b64[b64Ix+2]] << 6 | d_t[b64[b64Ix+3]] ;
     }
